@@ -11,7 +11,7 @@ module.exports.getUsers = (req, res) => {
 
 // Получение ID пользователя
 module.exports.getUserId = (req, res) => {
-  User.fundById(req.params.userId)
+  User.findById(req.params.userId)
     .orFail(new Error('NotValidId'))
     .then((users) => res.status(200).send({ data: users }))
     .catch((err) => {
@@ -49,12 +49,7 @@ module.exports.updateUser = (req, res) => {
     .then((user) =>
       res
         .status(200)
-        .send(
-          req.user._id,
-          { data: user },
-          { new: true },
-          { runValidators: true }
-        )
+        .send(req.user._id, { data: user }, { new: true, runValidators: true })
     )
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -77,12 +72,7 @@ module.exports.updateUserAvatar = (req, res) => {
     .then((user) =>
       res
         .status(200)
-        .send(
-          req.user._id,
-          { data: user },
-          { new: true },
-          { runValidators: true }
-        )
+        .send(req.user._id, { data: user }, { new: true, runValidators: true })
     )
     .catch((err) => {
       if (err.name === 'CastError') {
