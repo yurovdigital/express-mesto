@@ -1,48 +1,70 @@
+const jwt = require('jsonwebtoken')
+const bcrypt = require('bcryptjs')
 const User = require('../models/user')
 
+// ERRORS
+// 400
+const BadRequestError = require('../errors/BadRequestError')
+
+// 404
+const NotFoundError = require('../errors/NotFoundError')
+
+// 409
+const ConflictError = require('../errors/ConflictError')
+
 // Получение списка пользователей
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.status(200).send({ data: users }))
-    .catch(() => {
-      res.status(500).send({ message: 'Ошибка сервера.' })
+    .catch((err) => {
+      next(err)
     })
 }
 
 // Получение ID пользователя
-module.exports.getUserId = (req, res) => {
+module.exports.getUserId = (req, res, next) => {
   User.findById(req.params.userId)
     .orFail(new Error('NotValidId'))
     .then((users) => res.status(200).send({ data: users }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные.' })
+        next(new BadRequestError('Переданы некорректные данные.'))
       } else if (err.message === 'NotValidId') {
-        res
-          .status(404)
-          .send({ message: 'Пользователь с указанным _id не найден.' })
+        next(new NotFoundError('Пользователь с указанным _id не найден.'))
       } else {
-        res.status(500).send({ message: 'Ошибка сервера.' })
+        next(err)
       }
     })
 }
 
 // Создание пользователя
-module.exports.postUser = (req, res) => {
-  const { name, about, avatar } = req.body
-  User.create({ name, about, avatar })
+module.exports.postUser = (req, res, next) => {
+  const { name, about, avatar, email, password } = req.body
+  bcrypt
+    .hash(password, 10)
+    .then((hash) =>
+      User.create({
+        name,
+        about,
+        avatar,
+        email,
+        password: hash,
+      })
+    )
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные.' })
+        next(new BadRequestError('Переданы некорректные данные.'))
+      } else if (err.name === 'MongoError' && err.code === 11000) {
+        next(new ConflictError('Пользователь с такими данными уже есть в базе'))
       } else {
-        res.status(500).send({ message: 'Ошибка сервера.' })
+        next(err)
       }
     })
 }
 
 // Обновление пользователя
-module.exports.updateUser = (req, res) => {
+module.exports.updateUser = (req, res, next) => {
   const { name, about } = req.body
   User.create({ name, about })
     .orFail(new Error('NotValidId'))
@@ -53,19 +75,17 @@ module.exports.updateUser = (req, res) => {
     )
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные.' })
+        next(new BadRequestError('Переданы некорректные данные.'))
       } else if (err.message === 'NotValidId') {
-        res
-          .status(404)
-          .send({ message: 'Пользователь с указанным _id не найден.' })
+        next(new NotFoundError('Пользователь с указанным _id не найден.'))
       } else {
-        res.status(500).send({ message: 'Ошибка сервера.' })
+        next(err)
       }
     })
 }
 
 // Обновление аватара пользователя
-module.exports.updateUserAvatar = (req, res) => {
+module.exports.updateUserAvatar = (req, res, next) => {
   const { avatar } = req.body
   User.create({ avatar })
     .orFail(new Error('NotValidId'))
@@ -76,13 +96,26 @@ module.exports.updateUserAvatar = (req, res) => {
     )
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные.' })
+        next(new BadRequestError('Переданы некорректные данные.'))
       } else if (err.message === 'NotValidId') {
-        res
-          .status(404)
-          .send({ message: 'Пользователь с указанным _id не найден.' })
+        next(new NotFoundError('Пользователь с указанным _id не найден.'))
       } else {
-        res.status(500).send({ message: 'Ошибка сервера.' })
+        next(err)
       }
+    })
+}
+
+// Логин
+module.exports.login = (req, res, next) => {
+  const { email, password } = req.body
+  User.findUserByCredentials(email, password)
+    .then((user) => {
+      const payload = { _id: user._id }
+      res.send({
+        token: jwt.sign(payload, 'key', { expiresIn: '7d' }),
+      })
+    })
+    .catch((err) => {
+      next(err)
     })
 }
