@@ -8,6 +8,11 @@ const { PORT = 3000 } = process.env
 // Роуты
 const usersRoutes = require('./routes/users')
 const cardRoutes = require('./routes/cards')
+const { postUser, login } = require('./controllers/users')
+
+// Middlewares
+const auth = require('./middlewares/auth')
+const error = require('./middlewares/error')
 
 const app = express()
 
@@ -15,18 +20,19 @@ const app = express()
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '618d36348e4e91b03233ccf3', // вставьте сюда _id созданного в предыдущем пункте пользователя
-  }
-
-  next()
-})
-
 mongoose.connect('mongodb://localhost:27017/mestodb')
+
+// Роуты для логина и регистрации
+app.post('/signin', login)
+app.post('/signup', postUser)
+
+// Авторизация
+app.use(auth)
 
 app.use('/', usersRoutes)
 app.use('/', cardRoutes)
+
+app.use(error)
 
 // Запуск сервера
 app.listen(PORT, () => {
