@@ -55,7 +55,7 @@ module.exports.postUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные.'))
-      } else if (err.name === 'MongoError' && err.code === 11000) {
+      } else if (err.code === 11000) {
         next(new ConflictError('Пользователь с такими данными уже есть в базе'))
       } else {
         next(err)
