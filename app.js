@@ -1,5 +1,9 @@
 const express = require('express')
 const bodyParser = require('body-parser')
+
+// Валидация
+const { celebrate, Joi, errors } = require('celebrate')
+
 // База данных
 const mongoose = require('mongoose')
 // ПОРТ
@@ -23,8 +27,31 @@ app.use(bodyParser.urlencoded({ extended: true }))
 mongoose.connect('mongodb://localhost:27017/mestodb')
 
 // Роуты для логина и регистрации
-app.post('/signin', login)
-app.post('/signup', postUser)
+app.post(
+  '/signin',
+  celebrate({
+    body: Joi.object().keys({
+      email: Joi.string().email().required(),
+      password: Joi.string().min(5).required(),
+    }),
+  }),
+  login
+)
+app.post(
+  '/signup',
+  celebrate({
+    body: Joi.object().keys({
+      email: Joi.string().email().required(),
+      password: Joi.string().min(5).required(),
+      name: Joi.string().min(2).max(30),
+      about: Joi.string().min(2).max(30),
+      avatar: Joi.string().pattern(
+        /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/
+      ),
+    }),
+  }),
+  postUser
+)
 
 // Авторизация
 app.use(auth)
@@ -32,6 +59,7 @@ app.use(auth)
 app.use('/', usersRoutes)
 app.use('/', cardRoutes)
 
+app.use(errors())
 app.use(error)
 
 // Запуск сервера
