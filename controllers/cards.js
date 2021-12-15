@@ -36,8 +36,9 @@ module.exports.deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
     .orFail(new Error('NotValidId'))
     .then((card) => {
-      if (card.owner.toString() === req.user._idString()) {
-        card.remove(() => res.status(200).send({ message: 'Карточка удалена' }))
+      if (card.owner.toString() === req.user._id.toString()) {
+        card.remove()
+        res.status(200).send({ message: 'Карточка удалена' })
       } else {
         next(new ForbiddenError('Вы не можете удалить не свою карточку'))
       }
