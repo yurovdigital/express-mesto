@@ -2,6 +2,9 @@ const Card = require('../models/card')
 // 400
 const BadRequestError = require('../errors/BadRequestError')
 
+// 403
+const ForbiddenError = require('../errors/ForbiddenError')
+
 // 404
 const NotFoundError = require('../errors/NotFoundError')
 
@@ -30,10 +33,15 @@ module.exports.postCard = (req, res, next) => {
 
 // Удаление карточки
 module.exports.deleteCard = (req, res, next) => {
-  Card.findByIdAndUpdate(req.params.cardId)
+  Card.findById(req.params.cardId)
     .orFail(new Error('NotValidId'))
     .then((card) => {
-      res.status(200).send({ data: card })
+      if (card.owner.toString() === req.user._id.toString()) {
+        card.remove()
+        res.status(200).send({ message: 'Карточка удалена' })
+      } else {
+        next(new ForbiddenError('Вы не можете удалить не свою карточку'))
+      }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
