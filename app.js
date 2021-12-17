@@ -12,13 +12,13 @@ const cors = require('cors')
 app.use(
   cors({
     option: [
-      'http://yurov.mesto.nomoredomains.rocks',
-      'https://yurov.mesto.nomoredomains.rocks',
+      'http://api.yurov.mesto.nomoredomains.rocks',
+      'https://api.yurov.mesto.nomoredomains.rocks',
       'http://localhost:3000',
     ],
     origin: [
-      'http://yurov.mesto.nomoredomains.rocks',
-      'https://yurov.mesto.nomoredomains.rocks',
+      'http://api.yurov.mesto.nomoredomains.rocks',
+      'https://api.yurov.mesto.nomoredomains.rocks',
       'http://localhost:3000',
     ],
     credentials: true,
