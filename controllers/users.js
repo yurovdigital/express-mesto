@@ -2,6 +2,9 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const User = require('../models/user')
 
+// ENV
+const { NODE_ENV, JWT_SECRET } = process.env
+
 // ERRORS
 // 400
 const BadRequestError = require('../errors/BadRequestError')
@@ -112,7 +115,11 @@ module.exports.login = (req, res, next) => {
     .then((user) => {
       const payload = { _id: user._id }
       res.send({
-        token: jwt.sign(payload, 'key', { expiresIn: '7d' }),
+        token: jwt.sign(
+          payload,
+          NODE_ENV === 'production' ? JWT_SECRET : 'key',
+          { expiresIn: '7d' }
+        ),
       })
     })
     .catch((err) => {
