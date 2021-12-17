@@ -1,13 +1,20 @@
+require('dotenv').config()
+
 const express = require('express')
 const bodyParser = require('body-parser')
 
 // Валидация
 const { celebrate, Joi, errors } = require('celebrate')
 
+// CORS
+const cors = require('./middlewares/cors')
+
 // База данных
 const mongoose = require('mongoose')
 // ПОРТ
 const { PORT = 3000 } = process.env
+
+app.use(cors)
 
 // Роуты
 const usersRoutes = require('./routes/users')
@@ -62,7 +69,6 @@ app.use(auth)
 
 app.use('/', usersRoutes)
 app.use('/', cardRoutes)
-
 
 // Логгер ошибок
 app.use(errorLogger)
