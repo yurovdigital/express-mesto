@@ -12,7 +12,7 @@ const mongoose = require('mongoose')
 // ПОРТ
 const { PORT = 3000 } = process.env
 
-// CRASH-TEST
+// // CRASH-TEST
 // app.get('/crash-test', () => {
 //   setTimeout(() => {
 //     throw new Error('Сервер сейчас упадёт')
