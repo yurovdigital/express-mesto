@@ -16,6 +16,13 @@ const { PORT = 3000 } = process.env
 
 app.use(cors)
 
+// CRASH-TEST
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт')
+  }, 0)
+})
+
 // Роуты
 const usersRoutes = require('./routes/users')
 const cardRoutes = require('./routes/cards')
