@@ -12,6 +12,13 @@ const mongoose = require('mongoose')
 // ПОРТ
 const { PORT = 3000 } = process.env
 
+// CRASH-TEST
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт')
+  }, 0)
+})
+
 // Роуты
 const usersRoutes = require('./routes/users')
 const cardRoutes = require('./routes/cards')
@@ -45,13 +52,6 @@ app.use(
     allowedHeaders: ['Content-Type', 'origin', 'Authorization'],
   })
 )
-
-// CRASH-TEST
-app.get('/crash-test', () => {
-  setTimeout(() => {
-    throw new Error('Сервер сейчас упадёт')
-  }, 0)
-})
 
 // Роуты для логина и регистрации
 app.post(
