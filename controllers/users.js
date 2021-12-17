@@ -113,56 +113,18 @@ module.exports.updateUserAvatar = (req, res, next) => {
 }
 
 // Логин
-// module.exports.login = (req, res, next) => {
-//   const { email, password } = req.body
-
-//   return User.findUserByCredentials(email, password)
-//     .then((user) => {
-//       const token = jwt.sign(
-//         { _id: user._id },
-//         NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
-//         { expiresIn: '7d' }
-//       )
-
-//       res.send({ token })
-//     })
-//     .catch(next)
-// }
-
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body
 
-  return User.findOne({ email })
-    .select('+password')
+  return User.findUserByCredentials(email, password)
     .then((user) => {
-      if (!user) throw new UnauthorizedError('Неверный логин или пароль')
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+        { expiresIn: '7d' }
+      )
 
-      bcrypt
-        .compare(password, user.password)
-        .then((isValid) => {
-          if (!isValid)
-            throw new UnauthorizedError('Неправильный логин или пароль')
-
-          if (isValid) {
-            const token = jwt.sign(
-              { _id: user._id },
-              NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
-              { expiresIn: '7d' }
-            )
-            res
-              .cookie('jwt', token, {
-                httpOnly: true,
-                sameSite: true,
-              })
-              .send({
-                name: user.name,
-                about: user.about,
-                avatar: user.avatar,
-                email: user.email,
-              })
-          }
-        })
-        .catch(next)
+      res.send({ token })
     })
     .catch(next)
 }
