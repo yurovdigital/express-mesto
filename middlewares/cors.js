@@ -4,6 +4,7 @@ const allowedCors = [
   'https://yurov.mesto.nomoredomains.rocks',
   'http://yurov.mesto.nomoredomains.rocks',
   'localhost:3000',
+  'http://localhost:3000',
 ]
 
 module.exports = (req, res, next) => {
