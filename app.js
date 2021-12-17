@@ -2,35 +2,15 @@ require('dotenv').config()
 
 const express = require('express')
 const bodyParser = require('body-parser')
+const cors = require('./middlewares/cors')
 
 // Валидация
 const { celebrate, Joi, errors } = require('celebrate')
-
-// CORS
-const cors = require('cors')
-
-app.use(
-  cors({
-    option: [
-      'http://api.yurov.mesto.nomoredomains.rocks',
-      'https://api.yurov.mesto.nomoredomains.rocks',
-      'http://localhost:3000',
-    ],
-    origin: [
-      'http://api.yurov.mesto.nomoredomains.rocks',
-      'https://api.yurov.mesto.nomoredomains.rocks',
-      'http://localhost:3000',
-    ],
-    credentials: true,
-  })
-)
 
 // База данных
 const mongoose = require('mongoose')
 // ПОРТ
 const { PORT = 3000 } = process.env
-
-app.use('*', cors(options))
 
 // CRASH-TEST
 app.get('/crash-test', () => {
@@ -38,6 +18,9 @@ app.get('/crash-test', () => {
     throw new Error('Сервер сейчас упадёт')
   }, 0)
 })
+
+// CORS
+app.use(cors)
 
 // Роуты
 const usersRoutes = require('./routes/users')
