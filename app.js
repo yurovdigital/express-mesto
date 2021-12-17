@@ -23,6 +23,8 @@ const options = {
   credentials: true,
 }
 
+app.use('*', cors(options))
+
 // База данных
 const mongoose = require('mongoose')
 // ПОРТ
