@@ -13,11 +13,11 @@ const mongoose = require('mongoose')
 const { PORT = 3000 } = process.env
 
 // CRASH-TEST
-app.get('/crash-test', () => {
-  setTimeout(() => {
-    throw new Error('Сервер сейчас упадёт')
-  }, 0)
-})
+// app.get('/crash-test', () => {
+//   setTimeout(() => {
+//     throw new Error('Сервер сейчас упадёт')
+//   }, 0)
+// })
 
 // Роуты
 const usersRoutes = require('./routes/users')
