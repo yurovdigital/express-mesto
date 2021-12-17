@@ -2,7 +2,7 @@ require('dotenv').config()
 
 const express = require('express')
 const bodyParser = require('body-parser')
-const cors = require('./middlewares/cors')
+const cors = require('cors')
 
 // Валидация
 const { celebrate, Joi, errors } = require('celebrate')
@@ -18,9 +18,6 @@ app.get('/crash-test', () => {
     throw new Error('Сервер сейчас упадёт')
   }, 0)
 })
-
-// CORS
-app.use(cors)
 
 // Роуты
 const usersRoutes = require('./routes/users')
@@ -42,6 +39,18 @@ mongoose.connect('mongodb://localhost:27017/mestodb')
 
 // Логгер запросов
 app.use(requestLogger)
+
+app.use(
+  cors({
+    origin: [
+      'https://yurov.mesto.nomoredomains.rocks',
+      'http://yurov.mesto.nomoredomains.rocks',
+      'http://localhost:3000',
+    ],
+    credentials: true,
+    methods: 'GET, PUT, PATCH, POST, DELETE',
+  })
+)
 
 // Роуты для логина и регистрации
 app.post(
