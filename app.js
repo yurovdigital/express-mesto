@@ -17,6 +17,7 @@ const { postUser, login } = require('./controllers/users')
 // Middlewares
 const auth = require('./middlewares/auth')
 const error = require('./middlewares/error')
+const { requestLogger, errorLogger } = require('./middlewares/logger')
 
 const app = express()
 
@@ -25,6 +26,9 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
 mongoose.connect('mongodb://localhost:27017/mestodb')
+
+// Логгер запросов
+app.use(requestLogger)
 
 // Роуты для логина и регистрации
 app.post(
@@ -58,6 +62,10 @@ app.use(auth)
 
 app.use('/', usersRoutes)
 app.use('/', cardRoutes)
+
+
+// Логгер ошибок
+app.use(errorLogger)
 
 app.use(errors())
 app.use(error)
