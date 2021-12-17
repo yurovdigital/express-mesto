@@ -9,21 +9,21 @@ const { celebrate, Joi, errors } = require('celebrate')
 // CORS
 const cors = require('cors')
 
-const options = {
-  origin: [
-    'https://yurov.mesto.nomoredomains.rocks',
-    'http://yurov.mesto.nomoredomains.rocks',
-    'localhost:3000',
-    'http://localhost:3000',
-  ],
-  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-  preflightContinue: false,
-  optionsSuccessStatus: 204,
-  allowedHeaders: ['Content-Type', 'origin', 'Authorization'],
-  credentials: true,
-}
-
-app.use('*', cors(options))
+app.use(
+  cors({
+    option: [
+      'http://yurov.mesto.nomoredomains.rocks',
+      'https://yurov.mesto.nomoredomains.rocks',
+      'http://localhost:3000',
+    ],
+    origin: [
+      'http://yurov.mesto.nomoredomains.rocks',
+      'https://yurov.mesto.nomoredomains.rocks',
+      'http://localhost:3000',
+    ],
+    credentials: true,
+  })
+)
 
 // База данных
 const mongoose = require('mongoose')
